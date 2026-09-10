@@ -517,7 +517,10 @@ hr{border:0;border-top:1px solid var(--classic-line) !important;margin:18px 0 !i
 </head>
 
 <body>
-<div style="position:fixed;top:12px;right:12px;z-index:1000"><button class="a-btn" onclick="AlfredTeacher.open()" style="margin-left:5px">👑 Teacher</button><button class="a-btn" onclick="AlfredLearning.open()">🏯 Learning Hub</button></div>
+<div id="alfredTopNav" style="position:fixed;top:12px;right:12px;z-index:1000;display:none;gap:6px">
+<button id="alfredTeacherBtn" class="a-btn" type="button">👑 Teacher</button>
+<button id="alfredLearningBtn" class="a-btn" type="button">🏯 Learning Hub</button>
+</div>
 
 
 <div class="container">
@@ -2226,8 +2229,8 @@ border:1px solid var(--border);box-shadow:0 24px 70px rgba(0,0,0,.3)}
 border:1px solid var(--border);box-shadow:0 16px 45px rgba(0,0,0,.18)}
 .v7-stat .num{font-size:1.7rem;font-weight:900}.v7-stat small,.v7-muted{color:var(--muted)}
 .v7-section{margin:20px 0}.v7-section h2{margin-bottom:10px}
-.v7-mode{min-height:138px;cursor:pointer;position:relative;overflow:hidden}
-.v7-mode:hover{transform:translateY(-3px);box-shadow:0 15px 38px rgba(0,0,0,.25)}
+.v7-mode{min-height:138px;cursor:pointer;position:relative;overflow:hidden;text-align:left;color:inherit;width:100%;font:inherit;appearance:none;-webkit-appearance:none}
+.v7-mode:hover{transform:translateY(-3px);box-shadow:0 15px 38px rgba(0,0,0,.25)} .v7-mode:focus-visible{outline:3px solid #ffd34d;outline-offset:2px}
 .v7-mode .ico{font-size:2rem}.v7-mode h3{margin:7px 0 4px}.v7-mode p{margin:0;color:var(--muted);font-size:.88rem}
 .v7-badge{position:absolute;right:10px;top:10px;font-size:.68rem;padding:4px 7px;border-radius:999px;background:#ffffff10}
 .v7-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
@@ -2259,6 +2262,11 @@ let V7=JSON.parse(localStorage.getItem(V7KEY)||"null")||{
   xp:0,level:1,streak:0,lastDay:"",
   achievements:{},flashIndex:0,filters:{level:"all",category:"all"}
 };
+if(!Number.isFinite(Number(V7.totalXP))){
+  V7.totalXP=Math.max(0,(Math.max(1,Number(V7.level)||1)-1)*1000+(Number(V7.xp)||0));
+}
+V7.level=Math.floor(V7.totalXP/1000)+1;
+V7.xp=V7.totalXP;
 function save(){localStorage.setItem(V7KEY,JSON.stringify(V7))}
 function esc7(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function list(){return typeof words==="function"?words().filter(x=>x.hanzi&&x.pinyin&&x.meaning):[]}
@@ -2266,8 +2274,10 @@ function sh(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1
 function user(){return state.user||localStorage.getItem("alfred_current_user")||"Pelajar"}
 function day(){return new Date().toISOString().slice(0,10)}
 function addXP(n){
-  n=Math.max(0,Math.round(Number(n)||0)); V7.xp+=n;
-  while(V7.xp>=V7.level*1000){V7.xp-=V7.level*1000;V7.level++}
+  n=Math.max(0,Math.round(Number(n)||0));
+  V7.totalXP=Math.max(0,Number(V7.totalXP)||0)+n;
+  V7.xp=V7.totalXP;
+  V7.level=Math.floor(V7.totalXP/1000)+1;
   save()
 }
 function updateStreak(){
@@ -2317,7 +2327,9 @@ function render(){
   let root=document.getElementById("v7Dashboard");
   if(!root)return;
   const d=dailyDone(), cats=categories(), pool=filtered(), scores=(db.scores||[]).filter(x=>x.name===user()).slice().reverse().slice(0,10);
-  const pct=Math.round(V7.xp/(V7.level*1000)*100);
+  const totalXP=Math.max(0,Number(V7.totalXP)||0);
+  const levelXP=totalXP%1000;
+  const pct=Math.round(levelXP/1000*100);
   const ach=achievements(), unlocked=ach.filter(x=>x[3]).length;
   const weak=pool.map(w=>({w,n:masteryFor(w)})).sort((a,b)=>a.n-b.n).slice(0,6);
   const modes=[
@@ -2343,11 +2355,11 @@ function render(){
         <span class="v7-chip">🏆 ${unlocked}/${ach.length} achievement</span>
         <span class="v7-chip">📚 ${list().length} kosakata</span>
       </div>
-      <div style="margin-top:15px"><div class="v7-bar"><span style="width:${pct}%"></span></div><small class="v7-muted">${V7.xp}/${V7.level*1000} XP menuju level berikutnya</small></div>
+      <div style="margin-top:15px"><div class="v7-bar"><span style="width:${pct}%"></span></div><small class="v7-muted">${levelXP}/1000 XP menuju level berikutnya • Total ${totalXP} XP</small></div>
     </section>
 
     <section class="v7-grid">
-      <div class="v7-card v7-stat"><div class="num">${V7.xp}</div><small>XP Level</small></div>
+      <div class="v7-card v7-stat"><div class="num">${totalXP}</div><small>Total XP</small></div>
       <div class="v7-card v7-stat"><div class="num">${V7.level}</div><small>Level</small></div>
       <div class="v7-card v7-stat"><div class="num">${V7.streak}</div><small>Hari Streak</small></div>
       <div class="v7-card v7-stat"><div class="num">${unlocked}/${ach.length}</div><small>Achievement</small></div>
@@ -2364,7 +2376,7 @@ function render(){
       </div>
     </section>
 
-    <section class="v7-section"><h2>🎮 Latihan</h2><div class="v7-grid">${modes.map(m=>`<div class="v7-card v7-mode" data-v7mode="${m[2]}"><span class="v7-badge">${m[4]}</span><div class="ico">${m[0]}</div><h3>${m[1]}</h3><p>${m[3]}</p></div>`).join("")}</div></section>
+    <section class="v7-section"><h2>🎮 Latihan</h2><div class="v7-grid">${modes.map(m=>`<button type="button" class="v7-card v7-mode" data-v7mode="${m[2]}"><span class="v7-badge">${m[4]}</span><div class="ico">${m[0]}</div><h3>${m[1]}</h3><p>${m[3]}</p></button>`).join("")}</div></section>
 
     <section class="v7-section"><div class="v7-grid">
       <div class="v7-card"><h2>🎯 Daily Mission</h2>
@@ -2394,7 +2406,7 @@ function render(){
   root.querySelectorAll("[data-v7mode]").forEach(e=>e.onclick=()=>start(e.dataset.v7mode));
   document.getElementById("v7Flash").onclick=()=>flash();
   document.getElementById("v7Backup").onclick=()=>backup();
-  document.getElementById("v7Reset").onclick=()=>{if(confirm("Reset XP, level, streak, dan achievement V7?")){V7={xp:0,level:1,streak:0,lastDay:"",achievements:{},flashIndex:0,filters:{level:"all",category:"all"}};save();render()}};
+  document.getElementById("v7Reset").onclick=()=>{if(confirm("Reset XP, level, streak, dan achievement V7?")){V7={xp:0,totalXP:0,level:1,streak:0,lastDay:"",achievements:{},flashIndex:0,filters:{level:"all",category:"all"}};save();render()}};
 }
 function openGame(){document.getElementById("aHome").style.display="none";document.getElementById("aGame").style.display="block"}
 function backDash(){clearInterval(state.timer);document.getElementById("aGame").style.display="none";document.getElementById("aHome").style.display="block";mount()}
@@ -2422,6 +2434,7 @@ function finish(){
 }
 function start(type){
   try{
+    if(!(state.user||localStorage.getItem('alfred_current_user'))){alert('Silakan login sebagai siswa terlebih dahulu.');show('aLogin');return;}
     if(type==="flash"){flash();return}
     let p=pool(type==="boss"?10:12);
     // Never leave a tap apparently dead because a stale/empty filter was saved.
@@ -2576,6 +2589,13 @@ function mount(){
   render()
 }
 window.AlfredV7={refresh:mount,start,quizAnswer,speedAnswer,pickMatch,pickToken,resetBuilder,checkBuilder,listenAnswer,flipMemory,bossAnswer,flash};
+window.AlfredV7.setCloudProgress=function(total){
+  const n=Math.max(0,Number(total)||0);
+  if(n>=Number(V7.totalXP)||Number(V7.totalXP)===0){
+    V7.totalXP=n;V7.xp=n;V7.level=Math.floor(n/1000)+1;save();
+    try{mount()}catch(e){}
+  }
+};
 const oldFinish=window.A&&A.finish;
 if(oldFinish&&!A.__v7Wrapped){
   A.__v7Wrapped=true;
@@ -2617,14 +2637,14 @@ setTimeout(mount,100);
   'use strict';
 
   const FIREBASE_CONFIG = window.ALFRED_FIREBASE_CONFIG = {
-    apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
-    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "PASTE_YOUR_DATABASE_URL",
-    projectId: "PASTE_YOUR_PROJECT_ID",
-    storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-    messagingSenderId: "PASTE_YOUR_SENDER_ID",
-    appId: "PASTE_YOUR_APP_ID"
-  };
+     apiKey: "AIzaSyAF0QNSqQNU1IenpDfEVjnetMAPCZV4pRQ",
+     authDomain: "bahasa-mandarin.firebaseapp.com",
+     databaseURL: "https://bahasa-mandarin-default-rtdb.firebaseio.com/",
+     projectId: "bahasa-mandarin",
+     storageBucket: "bahasa-mandarin.firebasestorage.app",
+     messagingSenderId: "962821886407",
+     appId: "1:962821886407:web:8605abe8b0399a5afa09e2"
+   };
 
   let cloudReady=false, auth=null, cloudDb=null, currentUid=null;
   const configured=Object.values(FIREBASE_CONFIG).every(v=>v && !String(v).startsWith('PASTE_'));
@@ -2736,10 +2756,28 @@ setTimeout(mount,100);
     if(!cloudReady||!currentUid)return;
     const snap=await cloudDb.ref('players/'+currentUid).once('value');
     const p=snap.val()||{};
-    if(p.username && window.alfredSetCloudXP) window.alfredSetCloudXP(p.xp||0,p.level||1);
+    if(p.username){
+       if(window.alfredSetCloudXP) window.alfredSetCloudXP(p.xp||0,p.level||1);
+       if(window.AlfredV7 && typeof window.AlfredV7.setCloudProgress==='function') window.AlfredV7.setCloudProgress(p.xp||0);
+     }
   }
 
-  async function submitResult(r){
+   async function addXP(n){
+     if(!configured||!cloudDb||!currentUid)return;
+     const gained=Math.max(0,Math.round(Number(n)||0));
+     if(!gained)return;
+     try{
+       const ref=cloudDb.ref('players/'+currentUid);
+       await ref.transaction(p=>{
+         p=p||{username:localStorage.getItem('alfred_current_user')||'Siswa',xp:0,level:1,bestScore:0,totalGames:0};
+         p.xp=(Number(p.xp)||0)+gained;p.level=Math.floor(p.xp/1000)+1;
+         p.updatedAt=firebase.database.ServerValue.TIMESTAMP;return p;
+       });
+       await refreshLeaderboardPreview();
+     }catch(e){console.error('addXP',e)}
+   }
+
+   async function submitResult(r){
     if(!configured||!cloudDb||!currentUid)return;
     try{
       const ref=cloudDb.ref('players/'+currentUid);
@@ -2797,7 +2835,7 @@ setTimeout(mount,100);
     }catch(e){console.error(e)}
   }
 
-  window.GlobalLeaderboard={init,register,login,submitResult,getTop100,openLeaderboard,refreshLeaderboardPreview};
+  window.GlobalLeaderboard={init,register,login,submitResult,addXP,getTop100,openLeaderboard,refreshLeaderboardPreview};
   window.openGlobalLeaderboard=openLeaderboard;
   window.closeGlobalLeaderboard=closeLeaderboard;
 
@@ -2821,6 +2859,27 @@ setTimeout(mount,100);
   setTimeout(()=>{if(document.readyState!=='loading')init()},100);
 })();
 </script>
+<script id="alfred-role-router-fix">
+(function(){
+ 'use strict';
+ function isTeacher(){return (window.currentUser||window.loggedInUser||localStorage.getItem('alfred_current_user')||'').trim().toLowerCase()==='alfred.admin'}
+ function refreshRoleUI(){
+   const nav=document.getElementById('alfredTopNav'),teacher=document.getElementById('alfredTeacherBtn'),learning=document.getElementById('alfredLearningBtn');
+   const logged=!!(window.currentUser||window.loggedInUser||localStorage.getItem('alfred_current_user'));
+   if(nav)nav.style.display=logged?'flex':'none';
+   if(teacher)teacher.style.display=isTeacher()?'inline-flex':'none';
+   if(learning)learning.style.display=logged?'inline-flex':'none';
+   if(teacher)teacher.onclick=()=>{if(isTeacher())window.AlfredTeacher.open();else alert('Akses Teacher hanya untuk akun guru.')};
+   if(learning)learning.onclick=()=>window.AlfredLearning.open();
+   const admin=document.getElementById('aAdminEntry');if(admin)admin.style.display=isTeacher()?'block':'none';
+ }
+ window.AlfredRefreshRoleUI=refreshRoleUI;
+ document.addEventListener('DOMContentLoaded',()=>{refreshRoleUI();setTimeout(refreshRoleUI,200);setTimeout(refreshRoleUI,800)});
+ const oldLocal=window.alfredLoginLocalOnly;
+ window.alfredLoginLocalOnly=function(name){if(typeof oldLocal==='function')oldLocal(name);setTimeout(refreshRoleUI,50)};
+ setInterval(refreshRoleUI,1200);
+})();
+</script>
 
 <style id="alfred-crimson-classic-theme">
 :root{
@@ -2840,7 +2899,7 @@ button,.v7-mode,.v6-mode,.a-card,.v7-card{font-family:Georgia,'Times New Roman',
 .a-btn,.v7-btn{background:linear-gradient(135deg,#b91936,#7d1025)!important;border:1px solid rgba(255,211,77,.24)!important;color:#fff!important;border-radius:9px!important;box-shadow:0 5px 16px rgba(0,0,0,.3)!important}
 .a-btn.secondary,.v7-btn.secondary{background:#29292e!important;border:1px solid rgba(255,255,255,.14)!important}
 .a-btn:hover,.v7-btn:hover{box-shadow:0 7px 20px rgba(194,31,58,.25)!important}
-.v7-mode{background:linear-gradient(145deg,#1b1b20,#111114)!important;border-radius:12px!important;border-left:3px solid #c21f3a!important;min-height:145px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.v7-mode{background:linear-gradient(145deg,#1b1b20,#111114)!important;border-radius:12px!important;border-left:3px solid #c21f3a!important;min-height:145px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;text-align:left;color:#fff!important;padding:18px!important;width:100%;font:inherit;appearance:none;-webkit-appearance:none}
 .v7-mode:hover{transform:translateY(-2px);border-left-color:#ef4f83!important}
 .v7-mode:active{transform:scale(.985)!important}
 .v7-chip,.v7-badge{background:#26262b!important;border:1px solid rgba(255,211,77,.20)!important;border-radius:7px!important}
@@ -2855,8 +2914,8 @@ button,.v7-mode,.v6-mode,.a-card,.v7-card{font-family:Georgia,'Times New Roman',
 .v7-modal-box{background:#151519!important;border:1px solid #4a4a50!important;border-radius:12px!important}
 #alfredGlobalModal>div{background:#151519!important;border:1px solid #4a4a50!important;border-radius:12px!important}
 #alfredApp{position:relative;z-index:2}
-#v7Dashboard{position:relative;z-index:3}
-@media(max-width:650px){.v7-grid{grid-template-columns:1fr!important}.v7-mode{min-height:118px}.v7-action-row .v7-btn,.a-grid3 .a-btn{width:100%}}
+#v7Dashboard{position:relative;z-index:3} #v7Dashboard .v7-mode{pointer-events:auto!important}
+@media(max-width:650px){#alfredTopNav{top:8px!important;right:8px!important}.v7-grid{grid-template-columns:1fr!important}.v7-mode{min-height:118px}.v7-action-row .v7-btn,.a-grid3 .a-btn{width:100%}}
 </style>
 <script id="alfred-reliable-mobile-buttons">
 (function(){
@@ -2878,7 +2937,7 @@ button,.v7-mode,.v6-mode,.a-card,.v7-card{font-family:Georgia,'Times New Roman',
           else alert('Mesin game belum siap. Muat ulang halaman sekali.');
         }catch(e){console.error(e);alert('Game gagal dibuka: '+(e.message||e));}
       };
-      card.addEventListener('click',go,{passive:true});
+      card.addEventListener('click',e=>{e.preventDefault();go()},{passive:false});
       card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()} });
     });
   }
