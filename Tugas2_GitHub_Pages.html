@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <!-- GitHub Pages / Mobile optimization -->
-<meta name="theme-color" content="#0b1020">
+<meta name="theme-color" content="#24364b">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -416,7 +416,105 @@ input:focus,select:focus,textarea:focus{outline:none!important;border-color:rgba
 .v6-toast{position:fixed;right:18px;bottom:18px;z-index:99999;padding:12px 16px;border-radius:14px;background:rgba(12,17,38,.94);border:1px solid var(--border);box-shadow:0 16px 40px rgba(0,0,0,.35);animation:v6pop .25s ease}
 @keyframes v6pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
 @media(max-width:640px){.v6-hero{padding:21px}.v6-grid{grid-template-columns:1fr 1fr}.v6-mode{min-height:125px;padding:15px}.v6-weak-row{grid-template-columns:64px 1fr 42px}}
-</style></head>
+</style>
+<!-- Firebase for Global Leaderboard (GitHub Pages compatible) -->
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js"></script>
+<style id="alfred-classic-theme">
+:root{
+  --classic-paper:#f4efe4;
+  --classic-paper-2:#ebe3d2;
+  --classic-ink:#20252b;
+  --classic-muted:#6f6a61;
+  --classic-navy:#24364b;
+  --classic-navy-2:#304861;
+  --classic-burgundy:#7a3038;
+  --classic-gold:#b08a4a;
+  --classic-line:#d2c5ad;
+  --classic-white:#fffdf8;
+}
+html{background:var(--classic-paper)}
+body{
+  font-family:Georgia,"Times New Roman",serif !important;
+  background:
+    radial-gradient(circle at 12% 8%,rgba(176,138,74,.10),transparent 24%),
+    radial-gradient(circle at 88% 92%,rgba(122,48,56,.06),transparent 25%),
+    var(--classic-paper) !important;
+  color:var(--classic-ink) !important;
+  padding:16px !important;
+}
+.container{max-width:820px !important}
+.card{
+  background:rgba(255,253,248,.97) !important;
+  color:var(--classic-ink) !important;
+  border:1px solid var(--classic-line) !important;
+  border-radius:10px !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  box-shadow:0 12px 32px rgba(52,43,31,.12),0 1px 0 rgba(255,255,255,.8) inset !important;
+  padding:26px !important;
+}
+h1,h2,h3,h4,.logo strong{font-family:Georgia,"Times New Roman",serif !important;color:var(--classic-navy) !important;letter-spacing:.01em}
+h1{font-weight:700 !important}
+.subtitle,.muted,.creator,.mode small,.question-label{color:var(--classic-muted) !important;opacity:1 !important}
+.logo{
+  width:76px !important;height:76px !important;margin:0 auto 16px !important;
+  border-radius:50% !important;
+  background:var(--classic-navy) !important;
+  border:4px double var(--classic-gold) !important;
+  box-shadow:0 5px 15px rgba(36,54,75,.18) !important;
+  color:#f8f0dc !important;
+}
+.mode-grid{gap:11px !important}
+.mode,.answer,.speak,.stat{
+  background:var(--classic-white) !important;
+  color:var(--classic-ink) !important;
+  border:1px solid var(--classic-line) !important;
+  border-radius:7px !important;
+  box-shadow:0 2px 7px rgba(50,40,25,.05) !important;
+}
+.mode{padding:16px 10px !important}
+.mode:hover{transform:translateY(-2px) !important;background:#f7f1e5 !important;border-color:var(--classic-gold) !important}
+.mode .icon{filter:saturate(.65)}
+.start-btn,.btn,.primary,.button-primary{
+  background:var(--classic-navy) !important;
+  color:#fffdf8 !important;
+  border:1px solid #18283a !important;
+  border-radius:7px !important;
+  box-shadow:0 3px 8px rgba(36,54,75,.18) !important;
+  font-family:Georgia,"Times New Roman",serif !important;
+}
+.start-btn:hover,.btn:hover,.primary:hover,.button-primary:hover{background:var(--classic-navy-2) !important;transform:translateY(-1px)}
+button{font-family:Georgia,"Times New Roman",serif}
+input,select,textarea{
+  background:#fffdf8 !important;color:var(--classic-ink) !important;
+  border:1px solid #cdbfa5 !important;border-radius:6px !important;
+  font-family:Georgia,"Times New Roman",serif !important;
+}
+input:focus,select:focus,textarea:focus{outline:none !important;border-color:var(--classic-gold) !important;box-shadow:0 0 0 2px rgba(176,138,74,.16) !important}
+.progress{background:#ddd4c3 !important;border-radius:3px !important;height:7px !important}
+.progress-bar{background:var(--classic-burgundy) !important}
+.question{color:var(--classic-navy) !important}
+.question-label{text-transform:uppercase;letter-spacing:.14em;font-size:11px !important}
+.speak:hover{background:#f3ecdf !important;border-color:var(--classic-gold) !important}
+.result-stat,.stat-card,.mode-card,.leaderboard-card,.achievement-card{
+  background:#faf6ed !important;border-color:var(--classic-line) !important;color:var(--classic-ink) !important;
+}
+.badge,.tag,.chip{border-radius:4px !important}
+hr{border:0;border-top:1px solid var(--classic-line) !important;margin:18px 0 !important}
+.creator{border-top:1px solid var(--classic-line);padding-top:16px;margin-top:22px !important}
+/* Classic header ornament */
+.card:first-child:before{content:"❖  ALFRED MANDARIN ACADEMY  ❖";display:block;text-align:center;color:var(--classic-gold);font-size:10px;letter-spacing:.18em;margin-bottom:14px}
+@media(max-width:600px){
+  body{padding:9px !important}
+  .card{padding:20px !important;border-radius:8px !important}
+  .logo{width:68px !important;height:68px !important}
+  h1{font-size:clamp(25px,8vw,38px) !important}
+  .mode{padding:14px 9px !important}
+}
+</style>
+</head>
 
 <body>
 <div style="position:fixed;top:12px;right:12px;z-index:1000"><button class="a-btn" onclick="AlfredTeacher.open()" style="margin-left:5px">👑 Teacher</button><button class="a-btn" onclick="AlfredLearning.open()">🏯 Learning Hub</button></div>
@@ -1341,10 +1439,16 @@ function playSound(type) {
   <div class="a-card">
     <h3>Masuk / Daftar</h3>
     <p class="a-muted">Masukkan nama. Nama <b>kamu</b> membuka ruang belajar.</p>
-    <input id="aName" class="a-input" maxlength="30" placeholder="Nama kamu">
-    <button class="a-btn" onclick="A.login()">🚀 Masuk</button>
+    <input id="aName" class="a-input" maxlength="30" placeholder="Username siswa">
+    <input id="aPin" class="a-input" maxlength="32" type="password" placeholder="PIN / password (min. 6 karakter)">
+    <div class="a-grid3">
+      <button class="a-btn" onclick="window.alfredRegister()">📝 Daftar</button>
+      <button class="a-btn" onclick="window.alfredLogin()">🚀 Masuk</button>
+      <button class="a-btn secondary" onclick="window.openGlobalLeaderboard()">🏆 Top 100</button>
+    </div>
+    <div id="alfredCloudStatus" class="a-notice">☁️ Global Leaderboard: menghubungkan...</div>
   </div>
-  <div class="a-notice">Nilai disimpan di perangkat ini. Setelah selesai, tersedia tombol WhatsApp untuk mengirim laporan nilai ke guru.</div>
+  <div class="a-notice">Nilai tetap tersedia offline di perangkat ini. Jika Firebase dikonfigurasi, XP dan ranking akan tersinkron ke Global Leaderboard Top 100.</div>
   <div class="a-muted" style="text-align:center;margin-top:15px">© 2026 Alfred — Mandarin Learning Project</div>
 </section>
 
@@ -2263,6 +2367,8 @@ function render(){
       <div class="v7-card"><h2>📊 Riwayat terbaru</h2><div class="v7-history">${scores.length?scores.map(x=>`<div class="v7-history-row"><span>${esc7(x.game)}</span><b>${x.score}</b><span>${x.accuracy}%</span><small>${new Date(x.time).toLocaleDateString("id-ID")}</small></div>`).join(""):"<p class='v7-muted'>Belum ada hasil.</p>"}</div></div>
     </div></section>
 
+    <section class="v7-section"><div class="v7-card" id="globalLeaderboardPreview"><h2>🏆 Global Leaderboard</h2><p class="v7-muted">Memuat Top 100 siswa...</p><div class="v7-action-row"><button class="v7-btn" onclick="window.openGlobalLeaderboard()">🌐 Lihat Top 100</button></div></div></section>
+
     <section class="v7-section"><div class="v7-card"><h2>🧰 Data & akun</h2><div class="v7-action-row">
       <button class="v7-btn secondary" id="v7Flash">📖 Flashcard</button>
       <button class="v7-btn secondary" id="v7Backup">💾 Backup Data</button>
@@ -2294,6 +2400,7 @@ function finish(){
   const names={quiz:"Adaptive Quiz",speed:"Speed Mandarin",match:"Match 3-Way",builder:"Word Builder",listen:"Listening",memory:"Memory Grid",boss:"Vocabulary Boss",review:"Weak Words",write:"Hanzi Writing"};
   const r={name:user(),game:names[state.game]||state.game,score:state.score,correct:state.correct,wrong:state.wrong,accuracy:acc,time:Date.now()};
   db.scores=db.scores||[];db.scores.push(r);save();state.lastResult=r;
+  if(window.GlobalLeaderboard) window.GlobalLeaderboard.submitResult(r);
   if(state.game==="boss")V7.achievements.boss=true;
   if(state.game==="write")V7.achievements.write=true;
   markAndXP(state.game);
@@ -2473,6 +2580,222 @@ setTimeout(mount,100);
 </script>
 
 
-<!-- GitHub Pages ready: no server-side dependency; learner data is stored locally in this browser. -->
+<!-- GitHub Pages ready. Optional Firebase backend powers online account + Global Leaderboard. -->
+
+<script>
+/* =========================================================
+   ALFRED GLOBAL LEADERBOARD ONLINE v1
+   Backend: Firebase Authentication + Realtime Database
+   Works from GitHub Pages. Replace the config below with
+   your Firebase Web App configuration.
+   ========================================================= */
+(function(){
+  'use strict';
+
+  const FIREBASE_CONFIG = window.ALFRED_FIREBASE_CONFIG = {
+    apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
+    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "PASTE_YOUR_DATABASE_URL",
+    projectId: "PASTE_YOUR_PROJECT_ID",
+    storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+    messagingSenderId: "PASTE_YOUR_SENDER_ID",
+    appId: "PASTE_YOUR_APP_ID"
+  };
+
+  let cloudReady=false, auth=null, cloudDb=null, currentUid=null;
+  const configured=Object.values(FIREBASE_CONFIG).every(v=>v && !String(v).startsWith('PASTE_'));
+
+  function status(text,ok=false){
+    const e=document.getElementById('alfredCloudStatus');
+    if(e){e.textContent=text;e.style.borderColor=ok?'#39e58c':'#ffffff18';}
+  }
+  function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+  function slug(s){return String(s||'').trim().toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,30);}
+  function emailFor(name){return slug(name)+'@users.alfredmandarin.firebaseapp.com';}
+  function validName(n){return /^[A-Za-z0-9_ .-]{2,30}$/.test(n) && !/^alfred\.admin$/i.test(n);}
+  function validPin(p){return String(p||'').length>=6;}
+
+  function loadScript(src){
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement('script'); s.src=src; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+    });
+  }
+
+  async function init(){
+    if(!configured){
+      status('⚠️ Cloud belum dikonfigurasi. Leaderboard lokal tetap bisa dipakai.');
+      return;
+    }
+    try{
+      if(!window.firebase){
+        await loadScript('https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js');
+        await loadScript('https://www.gstatic.com/firebasejs/12.18.0/firebase-auth-compat.js');
+        await loadScript('https://www.gstatic.com/firebasejs/12.18.0/firebase-database-compat.js');
+      }
+      if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      auth=firebase.auth(); cloudDb=firebase.database();
+      auth.onAuthStateChanged(async user=>{
+        currentUid=user?user.uid:null;
+        cloudReady=!!user;
+        if(user){
+          status('☁️ Global Leaderboard aktif • online',true);
+          await syncProfile();
+          refreshLeaderboardPreview();
+        }else status('☁️ Belum masuk ke server leaderboard.');
+      });
+      await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    }catch(e){
+      console.error('Firebase init:',e);
+      status('❌ Cloud gagal tersambung: '+(e.message||e));
+    }
+  }
+
+  async function ensureAuth(){
+    if(!configured) throw new Error('Firebase belum dikonfigurasi.');
+    if(!auth) await init();
+    if(auth.currentUser) return auth.currentUser;
+    throw new Error('Silakan masuk/daftar terlebih dahulu.');
+  }
+
+  async function register(){
+    const name=(document.getElementById('aName')?.value||'').trim();
+    const pin=(document.getElementById('aPin')?.value||'').trim();
+    if(!validName(name)) return alert('Username 2–30 karakter: huruf, angka, spasi, titik, garis bawah, atau tanda minus.');
+    if(!validPin(pin)) return alert('PIN/password minimal 6 karakter.');
+    if(!configured){
+      window.alfredLogin();
+      status('⚠️ Mode lokal: Firebase belum dikonfigurasi, jadi akun belum global.');
+      return;
+    }
+    try{
+      await init();
+      const cred=await auth.createUserWithEmailAndPassword(emailFor(name),pin);
+      currentUid=cred.user.uid;
+      const profile={username:name,xp:0,level:1,bestScore:0,totalGames:0,createdAt:firebase.database.ServerValue.TIMESTAMP,updatedAt:firebase.database.ServerValue.TIMESTAMP};
+      await cloudDb.ref('players/'+currentUid).set(profile);
+      localStorage.setItem('alfred_current_user',name);
+      window.alfredLoginLocalOnly(name);
+      status('✅ Akun online berhasil dibuat.',true);
+      await refreshLeaderboardPreview();
+    }catch(e){
+      console.error(e);
+      alert('Pendaftaran gagal: '+(e.message||e));
+    }
+  }
+
+  async function login(){
+    const name=(document.getElementById('aName')?.value||'').trim();
+    const pin=(document.getElementById('aPin')?.value||'').trim();
+    if(!validName(name)) return alert('Masukkan username yang valid.');
+    if(!validPin(pin)) return alert('Masukkan PIN/password minimal 6 karakter.');
+    if(!configured){
+      window.alfredLoginLocalOnly(name);
+      status('⚠️ Mode lokal aktif. Untuk leaderboard global, isi Firebase config.');
+      return;
+    }
+    try{
+      await init();
+      const cred=await auth.signInWithEmailAndPassword(emailFor(name),pin);
+      currentUid=cred.user.uid;
+      localStorage.setItem('alfred_current_user',name);
+      window.alfredLoginLocalOnly(name);
+      status('✅ Berhasil masuk • leaderboard online aktif.',true);
+      await syncProfile();
+      await refreshLeaderboardPreview();
+    }catch(e){
+      console.error(e);
+      alert('Login gagal. Pastikan username dan PIN benar.\n\n'+(e.message||e));
+    }
+  }
+
+  async function syncProfile(){
+    if(!cloudReady||!currentUid)return;
+    const snap=await cloudDb.ref('players/'+currentUid).once('value');
+    const p=snap.val()||{};
+    if(p.username && window.alfredSetCloudXP) window.alfredSetCloudXP(p.xp||0,p.level||1);
+  }
+
+  async function submitResult(r){
+    if(!configured||!cloudDb||!currentUid)return;
+    try{
+      const ref=cloudDb.ref('players/'+currentUid);
+      await ref.transaction(p=>{
+        p=p||{username:r.name,xp:0,level:1,bestScore:0,totalGames:0};
+        const gained=Math.max(1,Number(r.score)||0);
+        p.username=p.username||r.name;
+        p.xp=Number(p.xp)||0;
+        p.xp+=gained;
+        p.level=Math.floor(p.xp/1000)+1;
+        p.bestScore=Math.max(Number(p.bestScore)||0,Number(r.score)||0);
+        p.totalGames=(Number(p.totalGames)||0)+1;
+        p.updatedAt=firebase.database.ServerValue.TIMESTAMP;
+        return p;
+      });
+      await refreshLeaderboardPreview();
+    }catch(e){console.error('submitResult',e)}
+  }
+
+  async function getTop100(){
+    if(!cloudDb) return [];
+    const snap=await cloudDb.ref('players').orderByChild('xp').limitToLast(100).once('value');
+    const arr=[]; snap.forEach(c=>{const p=c.val()||{};arr.push({uid:c.key,username:p.username||'Siswa',xp:Number(p.xp)||0,level:Number(p.level)||1,bestScore:Number(p.bestScore)||0,totalGames:Number(p.totalGames)||0})});
+    arr.sort((a,b)=>b.xp-a.xp || b.bestScore-a.bestScore || a.username.localeCompare(b.username));
+    return arr;
+  }
+
+  async function openLeaderboard(){
+    let modal=document.getElementById('alfredGlobalModal');
+    if(!modal){
+      modal=document.createElement('div');modal.id='alfredGlobalModal';
+      modal.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);padding:18px;overflow:auto;display:none';
+      modal.innerHTML='<div style="max-width:760px;margin:20px auto;background:#101731;color:#eef3ff;border:1px solid #ffffff18;border-radius:24px;padding:20px"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2>🏆 Global Leaderboard</h2><button class="a-btn secondary" onclick="window.closeGlobalLeaderboard()">✕</button></div><p class="a-muted">Top 100 siswa berdasarkan XP.</p><div id="alfredGlobalRows">Memuat...</div></div>';
+      document.body.appendChild(modal);
+    }
+    modal.style.display='block';
+    const box=document.getElementById('alfredGlobalRows');box.innerHTML='<div class="a-notice">⏳ Mengambil ranking online...</div>';
+    if(!configured||!cloudDb){box.innerHTML='<div class="a-notice">⚠️ Firebase belum dikonfigurasi. Ikuti panduan setup untuk mengaktifkan ranking global.</div>';return;}
+    try{
+      const arr=await getTop100();
+      if(!arr.length){box.innerHTML='<div class="a-notice">Belum ada siswa di leaderboard.</div>';return;}
+      box.innerHTML=arr.map((p,i)=>{const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1);return `<div style="display:grid;grid-template-columns:50px 1fr auto auto;gap:8px;align-items:center;padding:11px 5px;border-bottom:1px solid #ffffff0d"><b>${medal}</b><span><b>${esc(p.username)}</b><small style="display:block;color:#9eabd0">Level ${p.level} • ${p.totalGames} game</small></span><strong>${p.xp.toLocaleString('id-ID')} XP</strong><small>#${i+1}</small></div>`}).join('');
+    }catch(e){box.innerHTML='<div class="a-notice">❌ Gagal mengambil leaderboard: '+esc(e.message||e)+'</div>';}
+  }
+
+  function closeLeaderboard(){const m=document.getElementById('alfredGlobalModal');if(m)m.style.display='none'}
+
+  async function refreshLeaderboardPreview(){
+    const root=document.getElementById('globalLeaderboardPreview');
+    if(!root||!configured||!cloudDb)return;
+    try{
+      const arr=await getTop100();
+      const top=arr.slice(0,5);
+      root.innerHTML='<h2>🏆 Global Leaderboard</h2>'+ (top.length?top.map((p,i)=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ffffff0d"><span>${i<3?['🥇','🥈','🥉'][i]:(i+1)+'.'} ${esc(p.username)}</span><b>${p.xp.toLocaleString('id-ID')} XP</b></div>`).join(''):'<p class="v7-muted">Belum ada data.</p>')+'<div class="v7-action-row"><button class="v7-btn" onclick="window.openGlobalLeaderboard()">🌐 Lihat Top 100</button></div>';
+    }catch(e){console.error(e)}
+  }
+
+  window.GlobalLeaderboard={init,register,login,submitResult,getTop100,openLeaderboard,refreshLeaderboardPreview};
+  window.openGlobalLeaderboard=openLeaderboard;
+  window.closeGlobalLeaderboard=closeLeaderboard;
+
+  window.alfredLoginLocalOnly=function(name){
+    try{
+      if(window.A && typeof A.login==='function'){
+        document.getElementById('aName').value=name;
+        A.login();
+      }
+    }catch(e){console.error('local login',e);alert('Login lokal gagal: '+(e.message||e));}
+  };
+  window.alfredLogin=login;
+  window.alfredRegister=register;
+
+  // Defensive repair for the old inline button handlers.
+  document.addEventListener('DOMContentLoaded',()=>{
+    const old=document.querySelector('#aLogin button[onclick="A.login()"]');
+    if(old)old.onclick=()=>window.alfredLogin();
+    setTimeout(init,50);
+  });
+  setTimeout(()=>{if(document.readyState!=='loading')init()},100);
+})();
+</script>
 </body>
 </html>
