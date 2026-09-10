@@ -1556,6 +1556,17 @@ const ALFRED_EXTRA_WORDS = [{"hanzi": "你好", "pinyin": "nǐ hǎo", "meaning":
 (function mergeExtraVocabulary(){
   const seen=new Set(db.words.map(w=>w.hanzi+'|'+w.pinyin));
   ALFRED_EXTRA_WORDS.forEach(w=>{if(!seen.has(w.hanzi+'|'+w.pinyin)) db.words.push(w);});
+  // HSK 3.0 migration layer. The old A1/A2/B1/B2 labels are retained only as
+  // legacy hints; the active learning filter now uses HSK 1-6 and HSK 7-9.
+  (function migrateToHSK(){
+    const map={A1:'HSK1',A2:'HSK2',B1:'HSK3',B2:'HSK4'};
+    db.words.forEach(w=>{
+      if(!w.level || !/^HSK(?:[1-6]|7-9)$/.test(String(w.level))){
+        w.level=map[w.level]||'HSK1';
+      }
+    });
+    save();
+  })();
   save();
 })();
 
@@ -1784,7 +1795,7 @@ const A={
    <input id="wP" class="a-input" placeholder="Pinyin, contoh: píngguǒ">
    <input id="wM" class="a-input" placeholder="Arti Indonesia, contoh: apel">
    <input id="wC" class="a-input" placeholder="Kategori, contoh: makanan">
-   <select id="wL" class="a-select"><option>A1</option><option>A2</option><option>B1</option></select>
+   <select id="wL" class="a-select"><option value="HSK1">HSK 1</option><option value="HSK2">HSK 2</option><option value="HSK3">HSK 3</option><option value="HSK4">HSK 4</option><option value="HSK5">HSK 5</option><option value="HSK6">HSK 6</option><option value="HSK7-9">HSK 7–9</option></select>
    <input id="wA" class="a-input" placeholder="URL audio opsional (mp3/ogg)">
    <button class="a-btn" onclick="A.addWord()">Tambah</button></div>
    <div class="a-card" style="margin-top:10px"><h3>📚 ${db.words.length} kosakata</h3><div class="a-admin-list">${db.words.map((w,i)=>`<div class="a-row"><span>${esc(w.hanzi)}</span><span>${esc(w.pinyin)}</span><span>${esc(w.meaning)}</span><button class="a-btn danger" onclick="A.delWord(${i})">×</button></div>`).join('')}</div></div>`;
@@ -2346,7 +2357,7 @@ function render(){
       <div class="v7-card">
         <h2>🎛️ Filter latihan</h2>
         <div class="v7-controls">
-          <select id="v7Level"><option value="all">Semua level</option><option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2">B2</option><option value="HSK1">HSK 1</option><option value="HSK2">HSK 2</option><option value="HSK3">HSK 3</option><option value="HSK4">HSK 4</option><option value="HSK5">HSK 5</option><option value="HSK6">HSK 6</option></select>
+          <select id="v7Level"><option value="all">Semua level</option><option value="HSK1">HSK 1 • Dasar I</option><option value="HSK2">HSK 2 • Dasar II</option><option value="HSK3">HSK 3 • Menengah I</option><option value="HSK4">HSK 4 • Menengah II</option><option value="HSK5">HSK 5 • Lanjutan I</option><option value="HSK6">HSK 6 • Lanjutan II</option><option value="HSK7-9">HSK 7–9 • Mahir</option></select>
           <select id="v7Cat"><option value="all">Semua kategori</option>${cats.map(c=>`<option value="${esc7(c)}">${esc7(c)}</option>`).join("")}</select>
           <button class="v7-btn secondary" id="v7Apply">Terapkan • ${pool.length} kata</button>
         </div>
@@ -2410,17 +2421,30 @@ function finish(){
   setTimeout(()=>{if(window.AlfredV7)window.AlfredV7.refresh()},80)
 }
 function start(type){
-  if(type==="flash"){flash();return}
-  let p=pool(type==="boss"?10:12);if(p.length<2){alert("Kosakata sesuai filter belum cukup.");return}
-  setState(type,p);
-  if(type==="quiz"||type==="review")quiz();
-  else if(type==="speed")startSpeed();
-  else if(type==="match")match();
-  else if(type==="builder")builder();
-  else if(type==="listen")listen();
-  else if(type==="memory")memory();
-  else if(type==="boss")boss();
-  else if(type==="write"){state.idx=0;state.attempts=0;A.write()}
+  try{
+    if(type==="flash"){flash();return}
+    let p=pool(type==="boss"?10:12);
+    // Never leave a tap apparently dead because a stale/empty filter was saved.
+    if(p.length<2){
+      V7.filters.level="all";
+      V7.filters.category="all";
+      save();
+      p=pool(type==="boss"?10:12);
+    }
+    if(p.length<2){alert("Kosakata belum cukup untuk mode ini.");return}
+    setState(type,p);
+    if(type==="quiz"||type==="review")quiz();
+    else if(type==="speed")startSpeed();
+    else if(type==="match")match();
+    else if(type==="builder")builder();
+    else if(type==="listen")listen();
+    else if(type==="memory")memory();
+    else if(type==="boss")boss();
+    else if(type==="write"){state.idx=0;state.attempts=0;A.write()}
+  }catch(err){
+    console.error("Alfred V7 start error:",err);
+    alert("Mode gagal dibuka. Sistem sudah menangkap error: "+(err.message||err));
+  }
 }
 function optionsFor(d,key,n=3){
   return sh([d,...sh(list().filter(x=>x.hanzi!==d.hanzi)).slice(0,n)])
@@ -2797,5 +2821,72 @@ setTimeout(mount,100);
   setTimeout(()=>{if(document.readyState!=='loading')init()},100);
 })();
 </script>
+
+<style id="alfred-crimson-classic-theme">
+:root{
+  --bg:#0b0b0d;--panel:#17171b;--panel2:#202024;--text:#f7f4ee;--muted:#b9b4b0;
+  --primary:#c21f3a;--secondary:#ef4f83;--accent:#ffd34d;--good:#d7f36b;--bad:#ff667d;
+  --gold:#f5c542;--border:rgba(255,255,255,.12);--classic-white:#fffaf2;--classic-gray:#8e8e95;
+}
+html,body{background:#09090b!important;color:var(--text)!important}
+body{font-family:Georgia,'Times New Roman',serif!important;background:
+ radial-gradient(circle at 15% 5%,rgba(194,31,58,.20),transparent 27%),
+ radial-gradient(circle at 85% 10%,rgba(239,79,131,.10),transparent 24%),
+ linear-gradient(180deg,#09090b 0%,#151519 55%,#09090b 100%)!important}
+body:before{background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px)!important;background-size:42px 42px!important}
+button,.v7-mode,.v6-mode,.a-card,.v7-card{font-family:Georgia,'Times New Roman',serif!important}
+.a-panel,.a-card,.v7-card,.v6-stat,.v6-setting,.v7-hero,.v6-hero{background:linear-gradient(145deg,#18181c,#0f0f12)!important;border:1px solid rgba(255,255,255,.14)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 16px 45px rgba(0,0,0,.38)!important}
+.a-title,.v7-hero h1,.v6-hero h1{letter-spacing:.02em}
+.a-btn,.v7-btn{background:linear-gradient(135deg,#b91936,#7d1025)!important;border:1px solid rgba(255,211,77,.24)!important;color:#fff!important;border-radius:9px!important;box-shadow:0 5px 16px rgba(0,0,0,.3)!important}
+.a-btn.secondary,.v7-btn.secondary{background:#29292e!important;border:1px solid rgba(255,255,255,.14)!important}
+.a-btn:hover,.v7-btn:hover{box-shadow:0 7px 20px rgba(194,31,58,.25)!important}
+.v7-mode{background:linear-gradient(145deg,#1b1b20,#111114)!important;border-radius:12px!important;border-left:3px solid #c21f3a!important;min-height:145px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.v7-mode:hover{transform:translateY(-2px);border-left-color:#ef4f83!important}
+.v7-mode:active{transform:scale(.985)!important}
+.v7-chip,.v7-badge{background:#26262b!important;border:1px solid rgba(255,211,77,.20)!important;border-radius:7px!important}
+.v7-bar span{background:linear-gradient(90deg,#c21f3a,#ef4f83,#ffd34d)!important}
+.v7-controls select,.v7-controls input,.a-input,.a-select,.a-textarea{background:#0e0e11!important;border:1px solid #44444a!important;color:#fff!important;border-radius:8px!important}
+.v7-ach .aico{color:#ffd34d}
+.v7-kicker{color:#ef4f83!important}
+.v7-muted,.a-muted{color:#b9b4b0!important}
+.v7-section>h2,.v7-card h2{color:#fffaf2}
+.v7-card .num{color:#ffd34d}
+.v7-modal{background:rgba(0,0,0,.86)!important}
+.v7-modal-box{background:#151519!important;border:1px solid #4a4a50!important;border-radius:12px!important}
+#alfredGlobalModal>div{background:#151519!important;border:1px solid #4a4a50!important;border-radius:12px!important}
+#alfredApp{position:relative;z-index:2}
+#v7Dashboard{position:relative;z-index:3}
+@media(max-width:650px){.v7-grid{grid-template-columns:1fr!important}.v7-mode{min-height:118px}.v7-action-row .v7-btn,.a-grid3 .a-btn{width:100%}}
+</style>
+<script id="alfred-reliable-mobile-buttons">
+(function(){
+  'use strict';
+  function repair(){
+    const root=document.getElementById('v7Dashboard');
+    if(!root)return;
+    root.querySelectorAll('[data-v7mode]').forEach(card=>{
+      if(card.dataset.boundClassic==='1')return;
+      card.dataset.boundClassic='1';
+      card.setAttribute('role','button');
+      card.setAttribute('tabindex','0');
+      const go=()=>{
+        const type=card.dataset.v7mode;
+        try{
+          if(window.AlfredV7 && typeof window.AlfredV7.start==='function') window.AlfredV7.start(type);
+          else if(typeof window.AlfredV7Start==='function') window.AlfredV7Start(type);
+          else if(window.A && typeof A.start==='function') A.start(type);
+          else alert('Mesin game belum siap. Muat ulang halaman sekali.');
+        }catch(e){console.error(e);alert('Game gagal dibuka: '+(e.message||e));}
+      };
+      card.addEventListener('click',go,{passive:true});
+      card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()} });
+    });
+  }
+  const obs=new MutationObserver(repair);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{repair();obs.observe(document.body,{childList:true,subtree:true})});
+  else {repair();obs.observe(document.body,{childList:true,subtree:true})}
+})();
+</script>
+
 </body>
 </html>
