@@ -1,82 +1,24 @@
-# Alfred Mandarin Learning Platform — Global Leaderboard
+# Alfred Mandarin — Global Leaderboard Classic
 
-Versi GitHub Pages dengan:
-- Username siswa + PIN/password
-- XP kumulatif
-- Level otomatis (1 level / 1000 XP)
-- Global Leaderboard Top 100
-- Ranking real-time dari Firebase Realtime Database
-- Riwayat lokal tetap berjalan offline
-- Admin tetap memakai akun `alfred.admin`
+## Isi versi ini
+- Tema klasik: merah, hitam, abu-abu, putih, pink, kuning/gold.
+- HSK 3.0 style levels: HSK 1, 2, 3, 4, 5, 6, dan HSK 7–9.
+- Tombol mode game dibuat lebih tahan terhadap masalah tap mobile.
+- Filter level lama A1/A2/B1/B2 dimigrasikan menjadi HSK1/HSK2/HSK3/HSK4 sebagai pemetaan awal/legacy, bukan klaim ekuivalensi resmi.
+- Firebase Authentication + Realtime Database tetap digunakan untuk Global Leaderboard.
 
-## 1. Firebase
+## GitHub Pages
+Upload `index.html` ke root repository, lalu aktifkan Settings → Pages → Deploy from branch → main → root.
 
-Buat project di Firebase Console, lalu:
+URL target:
+https://alofred1.github.io/Mandarin-web/
 
-1. Add Web App.
-2. Authentication → Sign-in method → aktifkan **Email/Password**.
-3. Realtime Database → Create Database.
-4. Salin konfigurasi Web App ke `index.html`, pada bagian:
+## Firebase
+1. Firebase Console → buat project.
+2. Tambahkan Web App.
+3. Authentication → Sign-in method → Email/Password → Enable.
+4. Realtime Database → Create database.
+5. Salin konfigurasi Web App dari Firebase ke `FIREBASE_CONFIG` di index.html.
+6. Atur Realtime Database Rules sesuai file rules yang dipakai pada paket sebelumnya.
 
-```js
-const FIREBASE_CONFIG = {
-  apiKey: "...",
-  authDomain: "...",
-  databaseURL: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
-};
-```
-
-## 2. Security Rules
-
-Untuk prototipe kelas, gunakan rules berikut di Realtime Database Rules:
-
-```json
-{
-  "rules": {
-    "players": {
-      ".read": true,
-      "$uid": {
-        ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['username','xp','level'])",
-        "username": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 30" },
-        "xp": { ".validate": "newData.isNumber() && newData.val() >= 0" },
-        "level": { ".validate": "newData.isNumber() && newData.val() >= 1" }
-      }
-    }
-  }
-}
-```
-
-Catatan: `.read: true` membuat Top 100 dapat dibaca publik. Penulisan tetap dibatasi ke akun yang sedang login.
-
-## 3. GitHub Pages
-
-Upload `index.html` ke root repository `Mandarin-web`.
-
-Settings → Pages:
-- Source: Deploy from a branch
-- Branch: `main`
-- Folder: `/ (root)`
-
-URL:
-`https://alofred1.github.io/Mandarin-web/`
-
-## 4. Cara kerja XP
-
-Setiap hasil game mengirim skor ke Firebase dan menambah XP:
-
-`XP baru = XP lama + skor game`
-
-Level:
-
-`Level = floor(XP / 1000) + 1`
-
-Leaderboard diurutkan berdasarkan XP terbesar dan menampilkan maksimal 100 siswa.
-
-## Penting
-
-`apiKey` Firebase Web App memang boleh berada di kode browser; keamanan utamanya berasal dari Authentication dan Realtime Database Security Rules. Jangan pernah memasukkan service-account private key ke HTML.
+Catatan: Realtime Database harus memakai `databaseURL` yang diberikan Firebase; bentuk URL dapat berbeda menurut region.
