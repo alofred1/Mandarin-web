@@ -1,31 +1,7 @@
-# Alfred Mandarin V4 — Modular GitHub Pages
+# Alfred Mandarin Modular V5
 
-Pages are split so a dashboard or game error does not block unrelated UI.
+Perbaikan utama V5: Firebase Auth session ditunggu melalui `onAuthStateChanged` sebelum redirect/profile dibaca, sehingga tidak terjadi loop kembali ke login setelah daftar.
 
-- `index.html` — login/register
-- `student.html` — student dashboard
-- `teacher.html` — teacher panel
-- `games.html` — game room
-- `leaderboard.html` — online Top 100
-- `js/vocabulary.js` — vocabulary bank
-- `js/firebase-config.js` — Firebase Web App config
-- `js/core.js` — auth/database core
-- `js/games.js` — game engine
-- `css/style.css` — theme
+Struktur: index.html, student.html, games.html, leaderboard.html, teacher.html, css/style.css, js/*.js.
 
-Firebase Realtime Database rules currently expected by the app:
-
-```json
-{
-  "rules": {
-    "players": {
-      ".read": true,
-      "$uid": {
-        ".write": "auth != null && auth.uid === $uid"
-      }
-    }
-  }
-}
-```
-
-Before production, tighten leaderboard read/write rules and make teacher authorization server-side/custom-claims based.
+Firebase config berada di `js/firebase-config.js`. Jangan ubah Rules yang sudah berhasil kecuali diperlukan.
