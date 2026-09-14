@@ -1,4 +1,4 @@
-const firebaseConfig = {
+window.FIREBASE_CONFIG = {
   apiKey: "AIzaSyAF0QNSqQNU1IenpDfEVjnetMAPCZV4pRQ",
   authDomain: "bahasa-mandarin.firebaseapp.com",
   databaseURL: "https://bahasa-mandarin-default-rtdb.firebaseio.com",
